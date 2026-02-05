@@ -213,16 +213,25 @@ def dashboard():
     cursor = db.cursor()
 
     # Stats
-    cursor.execute("SELECT COUNT(*) FROM hazards WHERE user_id=?", (session["user_id"],))
+    cursor.execute(
+        "SELECT COUNT(*) FROM hazards WHERE user_id=?",
+        (session["user_id"],)
+    )
     total = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM hazards WHERE user_id=? AND status='Pending'", (session["user_id"],))
+    cursor.execute(
+        "SELECT COUNT(*) FROM hazards WHERE user_id=? AND status='Pending'",
+        (session["user_id"],)
+    )
     pending = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM hazards WHERE user_id=? AND status='Resolved'", (session["user_id"],))
+    cursor.execute(
+        "SELECT COUNT(*) FROM hazards WHERE user_id=? AND status='Resolved'",
+        (session["user_id"],)
+    )
     resolved = cursor.fetchone()[0]
 
-    # 🔥 Fetch hazards with location
+    # Fetch hazards with location (for map)
     cursor.execute("""
         SELECT id, title, latitude, longitude, hazard_type, priority
         FROM hazards
@@ -234,7 +243,7 @@ def dashboard():
 
     return render_template(
         "dashboard.html",
-        name=session["user_name"],
+        name=session.get("user_name", "User"),
         total=total,
         pending=pending,
         resolved=resolved,
