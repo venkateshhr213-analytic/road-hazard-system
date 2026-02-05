@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
 app = Flask(__name__)
-app.secret_key = "dlgjvhaqsvlsefzz"  # already exists probably
+app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret") # already exists probably
 
 google_bp = make_google_blueprint(
     client_id="596222164061-o26hb0rdvnuajh2h67o7hpkm4kp53jt9.apps.googleusercontent.com",
