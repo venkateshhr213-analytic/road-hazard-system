@@ -4,3 +4,7 @@ requests
 flask-login
 flask-dance
 python-dotenv
+flask-mail
+flask-SQLAlchemy
+flask-WTF
+email-validator
