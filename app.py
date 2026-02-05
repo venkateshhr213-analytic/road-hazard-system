@@ -62,16 +62,21 @@ def init_db():
     """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS hazards (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            title TEXT,
-            description TEXT,
-            location TEXT,
-            hazard_type TEXT,
-            priority TEXT,
-            status TEXT
-        )
+    CREATE TABLE IF NOT EXISTS hazards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        title TEXT,
+        description TEXT,
+        location TEXT,
+        hazard_type TEXT,
+        priority TEXT,
+        status TEXT DEFAULT 'Pending',
+        image TEXT,
+        latitude REAL,
+        longitude REAL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )
     """)
 
     db.commit()
@@ -212,7 +217,7 @@ def dashboard():
     db = get_db()
     cursor = db.cursor()
 
-    # Stats
+    # ===== STATS =====
     cursor.execute(
         "SELECT COUNT(*) FROM hazards WHERE user_id=?",
         (session["user_id"],)
@@ -231,7 +236,27 @@ def dashboard():
     )
     resolved = cursor.fetchone()[0]
 
-    # Fetch hazards with location (for map)
+    # ===== RECENT HAZARDS (🔥 THIS WAS MISSING) =====
+    cursor.execute("""
+        SELECT
+            id,
+            title,
+            location,
+            hazard_type,
+            priority,
+            status,
+            image,
+            latitude,
+            longitude
+        FROM hazards
+        WHERE user_id=?
+        ORDER BY created_at DESC
+        LIMIT 5
+    """, (session["user_id"],))
+
+    recent_hazards = cursor.fetchall()
+
+    # ===== MAP HAZARDS =====
     cursor.execute("""
         SELECT id, title, latitude, longitude, hazard_type, priority
         FROM hazards
@@ -243,13 +268,14 @@ def dashboard():
 
     return render_template(
         "dashboard.html",
-        name=session.get("user_name", "User"),
+        name=session["user_name"],
         total=total,
         pending=pending,
         resolved=resolved,
+        recent_hazards=recent_hazards,   # ✅ NOW PASSED
         map_hazards=map_hazards
     )
-
+    
 # ================= EDIT/DELETE HAZARD =================
     
 @app.route("/edit-hazard/<int:hazard_id>", methods=["GET", "POST"])

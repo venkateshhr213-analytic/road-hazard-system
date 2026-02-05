@@ -16,7 +16,6 @@
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 240px;
             background: #0d6efd;
@@ -42,13 +41,11 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* ===== MAIN CONTENT ===== */
         .content {
             flex: 1;
             padding: 30px;
         }
 
-        /* ===== STATS ===== */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -72,7 +69,6 @@
         .pending h1 { color: orange; }
         .resolved h1 { color: green; }
 
-        /* ===== RECENT HAZARDS ===== */
         .recent-section {
             background: white;
             padding: 25px;
@@ -84,7 +80,7 @@
         .hazard-card {
             display: flex;
             gap: 20px;
-            padding: 15px;
+            padding: 15px 0;
             border-bottom: 1px solid #ddd;
         }
 
@@ -100,70 +96,24 @@
             border: 1px solid #ccc;
         }
 
-        .hazard-info h4 {
-            margin: 0;
-        }
-
         .priority {
             font-weight: bold;
         }
 
-        /* ===== ACTION BUTTONS ===== */
-        .action-btns {
-            margin-top: 10px;
-        }
-
-        .edit-btn {
-            background: #0d6efd;
-            color: white;
-            padding: 6px 12px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-right: 6px;
-            font-size: 14px;
-        }
-
-        .delete-btn {
-            background: #dc3545;
-            color: white;
-            padding: 6px 12px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .map-btn {
-            background: #198754;
-            color: white;
-            padding: 6px 12px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
-            margin-left: 6px;
-        }
-
-        /* ===== WELCOME ===== */
-        .welcome-card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 600px;
-        }
-
-        .btn {
+        .action-btns a {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 18px;
-            background: #198754;
-            color: white;
+            margin-right: 8px;
+            margin-top: 6px;
+            padding: 6px 12px;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: white;
         }
 
-        .btn:hover {
-            background: #146c43;
-        }
+        .edit-btn { background: #0d6efd; }
+        .delete-btn { background: #dc3545; }
+        .map-btn { background: #198754; }
     </style>
 </head>
 
@@ -171,7 +121,6 @@
 
 <div class="container">
 
-    <!-- SIDEBAR -->
     <div class="sidebar">
         <h2>Menu</h2>
         <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
@@ -180,10 +129,8 @@
         <a href="{{ url_for('logout') }}">🚪 Logout</a>
     </div>
 
-    <!-- CONTENT -->
     <div class="content">
 
-        <!-- STATS -->
         <div class="stats-row">
             <div class="stat-card">
                 <h3>Total Hazards</h3>
@@ -200,105 +147,69 @@
                 <h1>{{ resolved }}</h1>
             </div>
         </div>
-<!-- MAP SECTION -->
-<div class="recent-section">
-    <h3>🗺️ Hazard Map (All Reports)</h3>
 
-    <div id="map" style="width:100%; height:400px; border-radius:12px;"></div>
-</div>
-        <!-- RECENT HAZARDS -->
         <div class="recent-section">
             <h3>🕒 Recent Hazard Reports</h3>
 
             {% if recent_hazards %}
                 {% for h in recent_hazards %}
-                    <div class="hazard-card">
+                <div class="hazard-card">
 
-                        {% if h[6] %}
-                            <img src="{{ url_for('static', filename='uploads/' + h[6]) }}">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='no-image.png') }}">
-                        {% endif %}
+                    <img src="{% if h[6] %}{{ url_for('static', filename='uploads/' + h[6]) }}{% else %}{{ url_for('static', filename='no-image.png') }}{% endif %}">
 
-                        <div class="hazard-info">
-                            <h4>{{ h[1] }}</h4>
-                            <p>📍 {{ h[2] }}</p>
-                            <p class="priority">⚠ Priority: {{ h[4] }}</p>
-                            <p>Status: {{ h[5] }}</p>
+                    <div>
+                        <h4>{{ h[1] }}</h4>
+                        <p>📍 {{ h[2] }}</p>
+                        <p>Type: {{ h[3] }}</p>
+                        <p class="priority">Priority: {{ h[4] }}</p>
+                        <p>Status: {{ h[5] }}</p>
 
-                            <div class="action-btns">
-                                <a href="{{ url_for('edit_hazard', hazard_id=h[0]) }}" class="edit-btn">✏️ Edit</a>
+                        <div class="action-btns">
+                            <a href="{{ url_for('edit_hazard', hazard_id=h[0]) }}" class="edit-btn">✏️ Edit</a>
 
-                                <a href="{{ url_for('delete_hazard', hazard_id=h[0]) }}"
-                                   class="delete-btn"
-                                   onclick="return confirm('Delete this hazard?');">
-                                   🗑 Delete
-                                </a>
+                            <a href="{{ url_for('delete_hazard', hazard_id=h[0]) }}"
+                               class="delete-btn"
+                               onclick="return confirm('Delete this hazard?');">🗑 Delete</a>
 
-                                {% if h[7] and h[8] %}
-                                <a class="map-btn"
-                                   target="_blank"
-                                   href="https://www.google.com/maps?q={{ h[7] }},{{ h[8] }}">
-                                   📍 View on Map
-                                </a>
-                                {% endif %}
-                            </div>
+                            {% if h[7] and h[8] %}
+                            <a class="map-btn" target="_blank"
+                               href="https://www.google.com/maps?q={{ h[7] }},{{ h[8] }}">📍 Map</a>
+                            {% endif %}
                         </div>
-
                     </div>
+                </div>
                 {% endfor %}
             {% else %}
                 <p>No hazards reported yet 🚧</p>
             {% endif %}
         </div>
 
-        <!-- WELCOME -->
-        <div class="welcome-card">
-            <h2>Welcome, {{ name }} 👋</h2>
-            <p>Report road hazards and help keep roads safe.</p>
-            <a href="{{ url_for('report') }}" class="btn">+ Report Hazard</a>
-        </div>
+        <h3>🗺️ Hazard Map</h3>
+        <div id="map" style="width:100%; height:400px;"></div>
 
     </div>
 </div>
+
 <script>
 function initMap() {
-    const center = { lat: 20.5937, lng: 78.9629 };
-
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 5,
-        center: center
+        center: { lat: 20.5937, lng: 78.9629 }
     });
 
     const hazards = {{ map_hazards | tojson }};
 
     hazards.forEach(h => {
-        const marker = new google.maps.Marker({
+        new google.maps.Marker({
             position: { lat: h[2], lng: h[3] },
             map: map,
             title: h[1]
-        });
-
-        const info = new google.maps.InfoWindow({
-            content: `
-                <strong>${h[1]}</strong><br>
-                Type: ${h[4]}<br>
-                Priority: ${h[5]}
-            `
-        });
-
-        marker.addListener("click", () => {
-            info.open(map, marker);
         });
     });
 }
 </script>
 
-<script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTbJMuqQzarJ-Xln-AsbbZHdlu8t7E-J4&callback=initMap"
-    async
-    defer>
-</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTbJMuqQzarJ-Xln-AsbbZHdlu8t7E-J4&callback=initMap" async defer></script>
 
 </body>
 </html>
