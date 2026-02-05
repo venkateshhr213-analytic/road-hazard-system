@@ -396,6 +396,7 @@ def profile():
 
     db = get_db()
     cursor = db.cursor()
+
     cursor.execute(
         "SELECT name, email, profile_image FROM users WHERE id=?",
         (session["user_id"],)
@@ -403,11 +404,19 @@ def profile():
     user = cursor.fetchone()
     db.close()
 
+    # 🔐 Safety fallback
+    if not user:
+        return redirect(url_for("logout"))
+
+    name = user[0] or "User"
+    email = user[1] or "Not available"
+    profile_image = user[2] or "default.png"
+
     return render_template(
         "profile.html",
-        name=user[0],
-        email=user[1],
-        profile_image=user[2]
+        name=name,
+        email=email,
+        profile_image=profile_image
     )
 # Start Google Login
 @app.route("/google-login")
