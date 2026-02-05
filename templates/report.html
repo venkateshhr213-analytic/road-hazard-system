@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Hazard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .report-card {
+            max-width: 520px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        input, textarea, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        button {
+            background: #198754;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #146c43;
+        }
+
+        .loc-btn {
+            background: #0d6efd;
+            margin-top: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="report-card">
+    <h2>📍 Report Hazard (Live Location)</h2>
+
+    <!-- enctype REQUIRED for image upload -->
+    <form method="POST" enctype="multipart/form-data">
+
+        <input type="text" name="title" placeholder="Hazard Title" required>
+
+        <textarea name="description" placeholder="Description" required></textarea>
+
+        <input type="text" name="location" placeholder="Location name (optional)">
+
+        <select name="hazard_type" required>
+            <option value="">Select Hazard Type</option>
+            <option>Accident</option>
+            <option>Open Manhole</option>
+            <option>Pothole</option>
+            <option>Broken Signal</option>
+            <option>Road Crack</option>
+        </select>
+
+        <!-- PHOTO -->
+        <input type="file" name="photo" accept="image/*">
+
+        <!-- CURRENT LOCATION BUTTON -->
+        <button type="button" class="loc-btn" onclick="getCurrentLocation()">
+            📍 Use My Current Location
+        </button>
+
+        <!-- HIDDEN LAT/LNG -->
+        <input type="hidden" name="latitude" id="lat">
+        <input type="hidden" name="longitude" id="lng">
+
+        <!-- MAP -->
+        <div id="map"></div>
+
+        <button type="submit">Submit Hazard</button>
+    </form>
+
+    <a href="/dashboard" class="back-link">⬅ Back to Dashboard</a>
+</div>
+
+<script>
+let map, marker;
+
+function initMap() {
+    const defaultLocation = { lat: 12.9716, lng: 77.5946 }; // fallback
+
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 14,
+        center: defaultLocation
+    });
+
+    marker = new google.maps.Marker({
+        position: defaultLocation,
+        map: map,
+        draggable: true
+    });
+
+    marker.addListener("dragend", function (e) {
+        document.getElementById("lat").value = e.latLng.lat();
+        document.getElementById("lng").value = e.latLng.lng();
+    });
+}
+
+function getCurrentLocation() {
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        function (pos) {
+            const userLocation = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            };
+
+            document.getElementById("lat").value = userLocation.lat;
+            document.getElementById("lng").value = userLocation.lng;
+
+            map.setCenter(userLocation);
+            marker.setPosition(userLocation);
+        },
+        function () {
+            alert("Location access denied");
+        }
+    );
+}
+</script>
+
+<!-- ADD YOUR API KEY -->
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTbJMuqQzarJ-Xln-AsbbZHdlu8t7E-J4&callback=initMap"
+    async defer>
+</script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Hazard</title>
+</head>
+<body>
+
+<h2>Edit Hazard</h2>
+
+<form method="POST">
+    <input type="text" name="title" value="{{ hazard[0] }}" required>
+    <textarea name="description" required>{{ hazard[1] }}</textarea>
+    <input type="text" name="location" value="{{ hazard[2] }}" required>
+
+    <select name="hazard_type" required>
+        <option>{{ hazard[3] }}</option>
+        <option>Accident</option>
+        <option>Pothole</option>
+        <option>Open Manhole</option>
+        <option>Broken Signal</option>
+    </select>
+
+    <button type="submit">Update</button>
+</form>
+
+<a href="/dashboard">Back</a>
+
+</body>
+</html>

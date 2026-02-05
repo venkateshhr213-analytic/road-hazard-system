@@ -1,0 +1,109 @@
+/* ===== Global ===== */
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f1727, #202b43, #2c3464);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== Card ===== */
+.card {
+    background: #ffffff;
+    width: 380px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Headings ===== */
+.card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #203a43;
+}
+
+/* ===== Inputs ===== */
+.card input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 15px;
+}
+
+.card input:focus {
+    border-color: #203a43;
+}
+
+/* ===== Button ===== */
+.card button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background: #203a43;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.card button:hover {
+    background: #2c5364;
+}
+
+/* ===== Links ===== */
+.card a {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    color: #203a43;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Messages ===== */
+.error {
+    background: #ffe5e5;
+    color: #b00020;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.success {
+    background: #e6fffa;
+    color: #00695c;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    text-align: center;
+}
