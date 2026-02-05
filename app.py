@@ -11,8 +11,8 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret") # already exists probably
 
 google_bp = make_google_blueprint(
-    client_id="596222164061-o26hb0rdvnuajh2h67o7hpkm4kp53jt9.apps.googleusercontent.com",
-    client_secret="GOCSPX-MJe_Qx0_O8Qbnph6o-60FvllNLw",
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
     scope=["profile", "email"],
     redirect_url="/login/google/authorized"
 )
@@ -20,8 +20,8 @@ google_bp = make_google_blueprint(
 app.register_blueprint(google_bp, url_prefix="/login")
 
 facebook_bp = make_facebook_blueprint(
-    client_id="2334926873679451",
-    client_secret="aa799577827886141d0903a0fd17a7d9",
+    client_id=os.environ.get("FACEBOOK_CLIENT_ID"),
+    client_secret=os.environ.get("FACEBOOK_CLIENT_SECRET"),
     scope=["email"],
     redirect_url="/facebook-callback"
 )
@@ -37,8 +37,8 @@ app.secret_key = "road_hazard_secret"
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USERNAME"] = "venkateshhr213@gmail.com"      # 🔁 replace
-app.config["MAIL_PASSWORD"] = "dlgjvhaqsvlsefzz"       # 🔁 replace
+app.config["MAIL_USERNAME"] = "yourgmail@gmail.com"      # 🔁 replace
+app.config["MAIL_PASSWORD"] = "YOUR_APP_PASSWORD"       # 🔁 replace
 
 mail = Mail(app)
 
@@ -352,6 +352,7 @@ def report():
         latitude = request.form.get("latitude")
         longitude = request.form.get("longitude")
 
+        # Priority logic
         if hazard_type in ["Accident", "Open Manhole"]:
             priority = "High"
         elif hazard_type in ["Pothole", "Broken Signal"]:
@@ -376,12 +377,16 @@ def report():
             latitude,
             longitude
         ))
-
         db.commit()
         db.close()
+
         return redirect(url_for("dashboard"))
 
-    return render_template("report.html")
+    # 🔑 PASS GOOGLE MAPS API KEY HERE
+    return render_template(
+        "report.html",
+        GOOGLE_MAPS_API_KEY=os.environ.get("GOOGLE_MAPS_API_KEY")
+    )
 
 # ================= LOGOUT =================
 @app.route("/logout")
