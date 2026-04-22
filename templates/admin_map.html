@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Hazard Map</title>
+    <style>
+        body {
+            font-family: Arial;
+            background:#f4f6f9;
+            margin:0;
+            padding:20px;
+        }
+
+        h2 {
+            margin-bottom:15px;
+        }
+
+        #map {
+            width:100%;
+            height:500px;
+            border-radius:12px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        a {
+            text-decoration:none;
+            font-weight:600;
+            color:#0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="toggleHeatmap()"
+style="
+padding:10px 18px;
+margin-bottom:12px;
+background:#0d6efd;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+">
+🔥 Toggle Heatmap
+</button>
+
+<h2>🛡️ Admin – Hazard Map</h2>
+<a href="{{ url_for('admin_dashboard') }}">⬅ Back to Dashboard</a>
+
+<br><br>
+
+<div id="map"></div>
+
+<script>
+function initMap() {
+
+    const center = { lat: 20.5937, lng: 78.9629 };
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 6,
+        center: center
+    });
+
+    /* ---------- HEATMAP DATA ---------- */
+    const heatmapData = [
+        {% for p in heatmap_points %}
+            new google.maps.LatLng({{ p[0] }}, {{ p[1] }}),
+        {% endfor %}
+    ];
+
+    const heatmap = new google.maps.visualization.HeatmapLayer({
+        data: heatmapData,
+        radius: 30
+    });
+
+    heatmap.setMap(map);
+
+
+    /* ---------- MARKERS ---------- */
+    {% for h in hazards %}
+        {% if h[6] and h[7] %}
+        new google.maps.Marker({
+            position: { lat: {{ h[6] }}, lng: {{ h[7] }} },
+            map: map,
+            title: "{{ h[1] }}",
+        });
+        {% endif %}
+    {% endfor %}
+
+
+    /* ---------- TOGGLE BUTTON ---------- */
+    window.toggleHeatmap = function() {
+        heatmap.setMap(heatmap.getMap() ? null : map);
+    }
+}
+</script>
+
+<!-- Google Maps -->
+<script async
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap">
+</script>
+
+</body>
+</html>

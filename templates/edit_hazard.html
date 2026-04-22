@@ -1,29 +1,178 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Hazard</title>
+<title>Edit Hazard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;}
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:linear-gradient(135deg,#eef2ff,#f8fafc);
+padding:40px;
+}
+.card{
+background:white;
+max-width:700px;
+margin:auto;
+padding:35px;
+border-radius:18px;
+box-shadow:0 20px 45px rgba(0,0,0,0.08);
+}
+input,textarea,select{
+width:100%;
+padding:13px;
+margin-top:12px;
+margin-bottom:18px;
+border-radius:10px;
+border:1px solid #dcdcdc;
+}
+#map{
+height:360px;
+border-radius:14px;
+margin-top:10px;
+}
+.btn{
+padding:14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+width:100%;
+}
+.locbtn{background:#0d6efd;color:white;}
+.update{background:#198754;color:white;}
+label{font-weight:600;}
+</style>
 </head>
+
 <body>
 
-<h2>Edit Hazard</h2>
+<div class="card">
+
+<h2>✏️ Edit Hazard</h2>
 
 <form method="POST">
-    <input type="text" name="title" value="{{ hazard[0] }}" required>
-    <textarea name="description" required>{{ hazard[1] }}</textarea>
-    <input type="text" name="location" value="{{ hazard[2] }}" required>
 
-    <select name="hazard_type" required>
-        <option>{{ hazard[3] }}</option>
-        <option>Accident</option>
-        <option>Pothole</option>
-        <option>Open Manhole</option>
-        <option>Broken Signal</option>
-    </select>
+<label>Title</label>
+<input name="title" value="{{ hazard.title }}" required>
 
-    <button type="submit">Update</button>
+<label>Description</label>
+<textarea name="description">{{ hazard.description }}</textarea>
+
+<label>Location</label>
+<input name="location" id="location" value="{{ hazard.location }}">
+
+<label>Hazard Type</label>
+<select name="hazard_type">
+<option {% if hazard.hazard_type=="Accident" %}selected{% endif %}>Accident</option>
+<option {% if hazard.hazard_type=="Pothole" %}selected{% endif %}>Pothole</option>
+<option {% if hazard.hazard_type=="Open Manhole" %}selected{% endif %}>Open Manhole</option>
+<option {% if hazard.hazard_type=="Broken Signal" %}selected{% endif %}>Broken Signal</option>
+<option {% if hazard.hazard_type=="Other" %}selected{% endif %}>Other</option>
+</select>
+
+<label>Status</label>
+<select name="status">
+<option {% if hazard.status=="Pending" %}selected{% endif %}>Pending</option>
+<option {% if hazard.status=="Resolved" %}selected{% endif %}>Resolved</option>
+</select>
+
+<!-- 🔥 AI SECTION -->
+<h3>🧠 Road Condition Details (AI Prediction)</h3>
+
+<label>Road Condition</label>
+<select name="road_condition">
+<option value="1">Very Bad</option>
+<option value="2">Bad</option>
+<option value="3">Moderate</option>
+<option value="4">Good</option>
+</select>
+
+<label>Traffic</label>
+<select name="traffic">
+<option value="1">Low</option>
+<option value="2">Medium</option>
+<option value="3">High</option>
+<option value="4">Very High</option>
+</select>
+
+<label>Weather</label>
+<select name="weather">
+<option value="0">Clear</option>
+<option value="1">Rain</option>
+<option value="2">Heavy Rain</option>
+</select>
+
+<label>Accident History</label>
+<select name="accident_history">
+<option value="0">No</option>
+<option value="1">Yes</option>
+</select>
+
+<input type="hidden" id="latitude" name="latitude" value="{{ hazard.latitude }}">
+<input type="hidden" id="longitude" name="longitude" value="{{ hazard.longitude }}">
+
+<button type="button" class="btn locbtn" onclick="useCurrentLocation()">📍 Detect Location</button>
+
+<div id="map"></div>
+
+<button class="btn update">✅ Update Hazard</button>
+
 </form>
 
-<a href="/dashboard">Back</a>
+</div>
+
+<script>
+let map, marker, geocoder;
+
+function initMap(){
+let lat=parseFloat(document.getElementById("latitude").value)||20.5937;
+let lng=parseFloat(document.getElementById("longitude").value)||78.9629;
+
+map=new google.maps.Map(document.getElementById("map"),{
+zoom:14,
+center:{lat,lng}
+});
+
+geocoder=new google.maps.Geocoder();
+
+marker=new google.maps.Marker({
+position:{lat,lng},
+map:map,
+draggable:true
+});
+
+marker.addListener("dragend",()=>{
+updateAddress(marker.getPosition().lat(),marker.getPosition().lng());
+});
+}
+
+function updateAddress(lat,lng){
+document.getElementById("latitude").value=lat;
+document.getElementById("longitude").value=lng;
+
+geocoder.geocode({location:{lat,lng}},(res,status)=>{
+if(status==="OK" && res[0]){
+document.getElementById("location").value=res[0].formatted_address;
+}
+});
+}
+
+function useCurrentLocation(){
+navigator.geolocation.getCurrentPosition(pos=>{
+let lat=pos.coords.latitude;
+let lng=pos.coords.longitude;
+
+marker.setPosition({lat,lng});
+map.setCenter({lat,lng});
+updateAddress(lat,lng);
+});
+}
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 
 </body>
 </html>

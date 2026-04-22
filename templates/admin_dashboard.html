@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Super Dashboard</title>
+
+<style>
+body{font-family:Segoe UI;background:#f4f6f9;padding:30px;}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:20px;margin-bottom:25px;
+}
+
+.card{
+background:white;padding:20px;border-radius:12px;
+box-shadow:0 8px 20px rgba(0,0,0,0.1);
+text-align:center;
+}
+
+.card h1{font-size:34px;margin:10px 0;}
+.blue h1{color:#0d6efd;}
+.orange h1{color:#fd7e14;}
+.green h1{color:#198754;}
+.red h1{color:#dc3545;}
+
+#map{
+width:100%;
+height:420px;
+border-radius:12px;
+margin-bottom:30px;
+}
+
+table{
+width:100%;
+background:white;
+border-collapse:collapse;
+border-radius:10px;
+overflow:hidden;
+}
+
+th,td{padding:12px;border-bottom:1px solid #ddd;}
+th{background:#0d6efd;color:white;}
+tr:hover{background:#f1f5ff;}
+
+.btn{
+padding:6px 12px;
+border:none;
+border-radius:6px;
+color:white;
+cursor:pointer;
+}
+
+.resolve{background:#198754;}
+#map{
+width:100%;
+height:420px;
+border-radius:12px;
+margin-bottom:30px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🛡️ ADMIN SUPER CONTROL PANEL</h2>
+
+<!-- STATS -->
+<div class="stats">
+<div class="card blue"><h3>Total</h3><h1>{{ total }}</h1></div>
+<div class="card orange"><h3>Pending</h3><h1>{{ pending }}</h1></div>
+<div class="card green"><h3>Resolved</h3><h1>{{ resolved }}</h1></div>
+<div class="card red"><h3>High Priority</h3><h1>{{ high_priority }}</h1></div>
+</div>
+
+<!-- MAP -->
+<div id="map"></div>
+
+<!-- TABLE -->
+<table>
+<tr>
+<th>Title</th>
+<th>Location</th>
+<th>Type</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+{% for h in hazards %}
+<tr>
+<td>{{h[1]}}</td>
+<td>{{h[2]}}</td>
+<td>{{h[3]}}</td>
+<td>{{h[4]}}</td>
+<td>{{h[5]}}</td>
+
+<td>
+{% if h[5]=="Pending" %}
+<form method="POST" action="{{ url_for('resolve_hazard', hazard_id=h[0]) }}">
+<button class="btn resolve">Resolve</button>
+</form>
+{% else %}
+✔ Done
+{% endif %}
+</td>
+
+</tr>
+{% endfor %}
+</table>
+
+<br><br>
+
+<!-- HOTSPOTS -->
+<h3>🔥 Dangerous Locations</h3>
+
+{% for h in hotspots %}
+<div>📍 {{h[0]}} → {{h[1]}} reports</div>
+{% endfor %}
+
+<!-- GOOGLE MAP -->
+<script>
+
+function initMap(){
+
+    const hazards = {{ heatmap_points | tojson | safe }};
+
+    const map = new google.maps.Map(
+        document.getElementById("map"),
+        {
+            zoom:5,
+            center:{lat:20.5937,lng:78.9629}
+        }
+    );
+
+    let heatData=[];
+    const bounds=new google.maps.LatLngBounds();
+
+    hazards.forEach(function(h){
+
+        const lat=parseFloat(h[0]);
+        const lng=parseFloat(h[1]);
+
+        if(!lat || !lng) return;
+
+        const pos={lat:lat,lng:lng};
+
+        heatData.push(new google.maps.LatLng(lat,lng));
+        bounds.extend(pos);
+
+        new google.maps.Marker({
+            position:pos,
+            map:map
+        });
+
+    });
+
+    if(heatData.length>0){
+        map.fitBounds(bounds);
+    }
+
+    const heatmap=new google.maps.visualization.HeatmapLayer({
+        data:heatData,
+        radius:40
+    });
+
+    heatmap.setMap(map);
+}
+
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=visualization&callback=initMap">
+</script>
+</body>
+</html>

@@ -1,167 +1,263 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Report Hazard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Hazard</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-        .report-card {
-            max-width: 520px;
-            margin: 30px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
+<style>
+*{box-sizing:border-box;}
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:linear-gradient(135deg,#eef2ff,#f8fafc);
+padding:40px;
+}
+.card{
+background:white;
+max-width:700px;
+margin:auto;
+padding:35px;
+border-radius:18px;
+box-shadow:0 20px 45px rgba(0,0,0,0.08);
+}
+input,textarea,select{
+width:100%;
+padding:13px;
+margin-top:12px;
+margin-bottom:18px;
+border-radius:10px;
+border:1px solid #dcdcdc;
+}
+#map{
+height:360px;
+border-radius:14px;
+margin-top:10px;
+}
+.btn{
+padding:14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+width:100%;
+}
+.submit{
+background:#198754;
+color:white;
+}
+video{
+border-radius:12px;
+margin-bottom:10px;
+}
 
-        input, textarea, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 12px;
-            font-size: 14px;
-        }
+/* 🔥 NEW PROFESSIONAL BUTTON PANEL */
+.action-panel{
+display:flex;
+flex-direction:column;
+gap:12px;
+margin:15px 0;
+}
 
-        textarea {
-            resize: vertical;
-        }
+.action-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:500;
+cursor:pointer;
+transition:all 0.3s ease;
+color:white;
+}
 
-        #map {
-            height: 300px;
-            width: 100%;
-            margin-top: 15px;
-            border-radius: 10px;
-        }
+.camera{
+background:linear-gradient(135deg,#0d6efd,#3b82f6);
+}
 
-        button {
-            background: #198754;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+.capture{
+background:linear-gradient(135deg,#6366f1,#8b5cf6);
+}
 
-        button:hover {
-            background: #146c43;
-        }
+.location{
+background:linear-gradient(135deg,#10b981,#059669);
+}
 
-        .loc-btn {
-            background: #0d6efd;
-            margin-top: 10px;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 15px;
-            text-decoration: none;
-        }
-    </style>
+.action-btn:hover{
+transform:translateY(-3px);
+box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+</style>
 </head>
 
 <body>
 
-<div class="report-card">
-    <h2>📍 Report Hazard (Live Location)</h2>
+<div class="card">
 
-    <!-- enctype REQUIRED for image upload -->
-    <form method="POST" enctype="multipart/form-data">
+<h2>🚧 Report New Hazard</h2>
 
-        <input type="text" name="title" placeholder="Hazard Title" required>
+<form method="POST">
 
-        <textarea name="description" placeholder="Description" required></textarea>
+<label>Title</label>
+<input name="title" required>
 
-        <input type="text" name="location" placeholder="Location name (optional)">
+<label>Description</label>
+<textarea name="description" required></textarea>
 
-        <select name="hazard_type" required>
-            <option value="">Select Hazard Type</option>
-            <option>Accident</option>
-            <option>Open Manhole</option>
-            <option>Pothole</option>
-            <option>Broken Signal</option>
-            <option>Road Crack</option>
-        </select>
+<label>Location</label>
+<input name="location" id="location">
 
-        <!-- PHOTO -->
-        <input type="file" name="photo" accept="image/*">
+<label>Hazard Type</label>
+<select name="hazard_type" required>
+<option>Accident</option>
+<option>Pothole</option>
+<option>Open Manhole</option>
+<option>Broken Signal</option>
+<option>Road Crack</option>
+</select>
 
-        <!-- CURRENT LOCATION BUTTON -->
-        <button type="button" class="loc-btn" onclick="getCurrentLocation()">
-            📍 Use My Current Location
-        </button>
+<!-- 🔥 CAMERA SECTION -->
+<label>Capture Photo</label>
 
-        <!-- HIDDEN LAT/LNG -->
-        <input type="hidden" name="latitude" id="lat">
-        <input type="hidden" name="longitude" id="lng">
+<video id="camera" width="100%" autoplay></video>
 
-        <!-- MAP -->
-        <div id="map"></div>
+<!-- ✅ PROFESSIONAL BUTTONS -->
+<div class="action-panel">
 
-        <button type="submit">Submit Hazard</button>
-    </form>
+  <button type="button" class="action-btn camera" onclick="startCamera()">
+    📷 Open Camera
+  </button>
 
-    <a href="/dashboard" class="back-link">⬅ Back to Dashboard</a>
+  <button type="button" class="action-btn capture" onclick="capturePhoto()">
+    📸 Capture Photo
+  </button>
+
+  <button type="button" class="action-btn location" onclick="useCurrentLocation()">
+    📍 Detect Location
+  </button>
+
+</div>
+
+<canvas id="canvas" style="display:none;"></canvas>
+<input type="hidden" name="photo_data" id="photo_data">
+
+<input type="hidden" id="lat" name="latitude">
+<input type="hidden" id="lng" name="longitude">
+
+<div id="map"></div>
+
+<!-- 🔥 ML SECTION -->
+<h3>🧠 AI Prediction Inputs</h3>
+
+<label>Road Condition</label>
+<select name="road_condition">
+<option value="1">Very Bad</option>
+<option value="2">Bad</option>
+<option value="3">Moderate</option>
+<option value="4">Good</option>
+</select>
+
+<label>Traffic</label>
+<select name="traffic">
+<option value="1">Low</option>
+<option value="2">Medium</option>
+<option value="3">High</option>
+<option value="4">Very High</option>
+</select>
+
+<label>Weather</label>
+<select name="weather">
+<option value="0">Clear</option>
+<option value="1">Rain</option>
+<option value="2">Heavy Rain</option>
+</select>
+
+<label>Accident History</label>
+<select name="accident_history">
+<option value="0">No</option>
+<option value="1">Yes</option>
+</select>
+
+<button class="btn submit">🚀 Submit Hazard</button>
+
+</form>
+
 </div>
 
 <script>
-let map, marker;
 
-function initMap() {
-    const defaultLocation = { lat: 12.9716, lng: 77.5946 }; // fallback
+let video=document.getElementById("camera");
 
-    map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 14,
-        center: defaultLocation
-    });
-
-    marker = new google.maps.Marker({
-        position: defaultLocation,
-        map: map,
-        draggable: true
-    });
-
-    marker.addListener("dragend", function (e) {
-        document.getElementById("lat").value = e.latLng.lat();
-        document.getElementById("lng").value = e.latLng.lng();
-    });
+function startCamera(){
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream=>video.srcObject=stream)
+.catch(()=>alert("Allow camera"));
 }
 
-function getCurrentLocation() {
-    if (!navigator.geolocation) {
-        alert("Geolocation not supported");
-        return;
-    }
+function capturePhoto(){
+let canvas=document.getElementById("canvas");
+let ctx=canvas.getContext("2d");
 
-    navigator.geolocation.getCurrentPosition(
-        function (pos) {
-            const userLocation = {
-                lat: pos.coords.latitude,
-                lng: pos.coords.longitude
-            };
+canvas.width=400;
+canvas.height=300;
 
-            document.getElementById("lat").value = userLocation.lat;
-            document.getElementById("lng").value = userLocation.lng;
+ctx.drawImage(video,0,0, 400,300);
 
-            map.setCenter(userLocation);
-            marker.setPosition(userLocation);
-        },
-        function () {
-            alert("Location access denied");
-        }
-    );
+let img=canvas.toDataURL("image/png",0.5);
+document.getElementById("photo_data").value=img;
+
+alert("Photo Captured!");
 }
+
+let map,marker,geocoder;
+
+function initMap(){
+const loc={lat:20.5937,lng:78.9629};
+
+map=new google.maps.Map(document.getElementById("map"),{
+zoom:5,center:loc
+});
+
+geocoder=new google.maps.Geocoder();
+
+marker=new google.maps.Marker({
+position:loc,map:map,draggable:true
+});
+
+marker.addListener("dragend",()=>{
+updateAddress(marker.getPosition().lat(),marker.getPosition().lng());
+});
+}
+
+function updateAddress(lat,lng){
+document.getElementById("lat").value=lat;
+document.getElementById("lng").value=lng;
+
+geocoder.geocode({location:{lat,lng}},(res,status)=>{
+if(status==="OK"){
+document.getElementById("location").value=res[0].formatted_address;
+}
+});
+}
+
+function useCurrentLocation(){
+navigator.geolocation.getCurrentPosition(pos=>{
+let lat=pos.coords.latitude;
+let lng=pos.coords.longitude;
+
+marker.setPosition({lat,lng});
+map.setCenter({lat,lng});
+map.setZoom(16);
+
+updateAddress(lat,lng);
+});
+}
+
 </script>
 
-<!-- ADD YOUR API KEY -->
-<script
-    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap"
-    async defer>
-</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMap" async defer></script>
 
 </body>
 </html>
