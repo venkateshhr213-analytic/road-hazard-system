@@ -101,7 +101,7 @@ def predict_priority(text, hazard_pred=None):
     else:
         text_priority = "Low"
 
-    # 🔥 Combine with ML prediction
+    #  Combine with ML prediction
     if hazard_pred == 1 and text_priority == "High":
         return "High"
     elif hazard_pred == 1:
@@ -249,7 +249,7 @@ def dashboard():
     resolved = c.fetchone()[0]
 
 
-    # ⭐⭐⭐ FIX IS HERE ⭐⭐⭐
+    # FIX IS HERE 
     c.execute("""
         SELECT id,title,location,hazard_type,priority,status,image,latitude,longitude
         FROM hazards
@@ -296,18 +296,18 @@ def report():
         if fake(desc):
             return "Fake report detected"
 
-        # 🔥 ML Inputs
+        # ML Inputs
         road_condition = int(request.form["road_condition"])
         traffic = int(request.form["traffic"])
         weather = int(request.form["weather"])
         accident_history = int(request.form["accident_history"])
 
-        # 🔥 ML Prediction
+        #  ML Prediction
         hazard_pred = predict_hazard(
             road_condition, traffic, weather, accident_history
         )
 
-        # 🔥 CAMERA IMAGE
+        #  CAMERA IMAGE
         img = None
         photo_data = request.form.get("photo_data")
         image_result = "Low"
@@ -324,7 +324,7 @@ def report():
 
             img = filename
 
-            # 🔥 OpenCV Image Analysis
+            #  OpenCV Image Analysis
             import cv2
 
             image = cv2.imread(filepath)
@@ -340,10 +340,10 @@ def report():
             else:
                 image_result = "Low"
 
-        # 🔥 TEXT + ML PRIORITY
+        #  TEXT + ML PRIORITY
         text_ml_priority = predict_priority(desc, hazard_pred)
 
-        # 🔥 FINAL HYBRID AI DECISION
+        #  FINAL HYBRID AI DECISION
         if image_result == "High" or text_ml_priority == "High":
             pr = "High"
         elif image_result == "Medium" or text_ml_priority == "Medium":
@@ -351,7 +351,7 @@ def report():
         else:
             pr = "Low"
 
-        # 🔥 SAVE TO DATABASE
+        #  SAVE TO DATABASE
         db = get_db()
         c = db.cursor()
 
@@ -397,18 +397,18 @@ def edit_hazard(hazard_id):
 
         desc = request.form["description"]
 
-        # 🔥 ML Inputs
+        #  ML Inputs
         road_condition = int(request.form["road_condition"])
         traffic = int(request.form["traffic"])
         weather = int(request.form["weather"])
         accident_history = int(request.form["accident_history"])
 
-        # 🔥 ML Prediction
+        #  ML Prediction
         hazard_pred = predict_hazard(
             road_condition, traffic, weather, accident_history
         )
 
-        # 🔥 Hybrid AI Priority
+        #  Hybrid AI Priority
         pr = predict_priority(desc, hazard_pred)
 
         c.execute("""
@@ -545,7 +545,7 @@ def admin_dashboard():
     """)
     hazards = c.fetchall()
 
-    # ⭐ CONVERT HEATMAP DATA TO NORMAL LIST
+    # ⭐l CONVERT HEATMAP DATA TO NORMAL LIST
     c.execute("""
         SELECT latitude, longitude
         FROM hazards
