@@ -1,24 +1,24 @@
-# 🚧 Road Hazard Reporting System
+#  Road Hazard Reporting System
 
-## 📌 Project Overview
+##  Project Overview
 The **Road Hazard Reporting System** is a web-based application that allows users to report road issues such as potholes, accidents, waterlogging, and damaged signals.  
 The system uses **Machine Learning and AI** to predict hazard severity and improve decision-making.
 
 ---
 
-## 🎯 Features
-- 📷 Capture hazard images using camera
-- 📍 Automatic location detection using GPS
-- 🤖 AI-based hazard prediction (priority detection)
-- 🧠 Machine Learning model (Random Forest / Logistic Regression)
-- 📝 User hazard reporting system
-- 🗺️ Google Maps integration
-- 📊 Admin dashboard for monitoring hazards
-- 🔐 User authentication system
+##  Features
+- Capture hazard images using camera
+-  Automatic location detection using GPS
+- AI-based hazard prediction (priority detection)
+-  Machine Learning model (Random Forest / Logistic Regression)
+-  User hazard reporting system
+-  Google Maps integration
+- Admin dashboard for monitoring hazards
+-  User authentication system
 
 ---
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 ### Frontend
 - HTML
@@ -42,7 +42,7 @@ The system uses **Machine Learning and AI** to predict hazard severity and impro
 
 ---
 
-## 🧠 Machine Learning Model
+## Machine Learning Model
 The system uses:
 - Logistic Regression
 - Random Forest
@@ -59,7 +59,7 @@ The system uses:
 
 ---
 
-## 📷 Camera Integration
+## Camera Integration
 Users can:
 - Open camera directly in browser
 - Capture real-time images
@@ -67,15 +67,9 @@ Users can:
 
 ---
 
-## 📍 Location Detection
+## Location Detection
 - Uses browser GPS API
 - Automatically fetches latitude & longitude
 - Displays location on Google Maps
 
 ---
-
-## 🚀 How to Run the Project
-
-1. Clone the repository:
-```bash
-git clone https://github.com/your-username/road-hazard-system.git
